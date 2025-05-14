@@ -42,7 +42,7 @@ class Label(sprite.Sprite):
 
 class Snake:
     def __init__(self):
-        self.body = [[100, 50], [80, 50], [60, 50]]  
+        self.body = [[100, 60], [80, 50], [60, 50]]  
         self.direction = 'RIGHT'
         self.change_to = self.direction
 
@@ -80,13 +80,14 @@ class Snake:
             return True
         return False
     
-    def check_collision_food(self):
+    #def check_collision_food(self):
+
     
     def draw(self, surface):
         for part in self.body:
             draw.rect(surface, BLACK, Rect(part[0], part[1], block_size, block_size))
 
-class Food(Label):
+class Food():
     def __init__(self):
         self.position=[random.randrange(0,frame_size_x,block_size),random.randrange(0,frame_size_y,block_size)]
 
@@ -118,8 +119,9 @@ while run:
                 snake.change_direction('LEFT')
             elif e.key == K_RIGHT:
                 snake.change_direction('RIGHT')
+    
 
-    if snake.check_collision(food.position):
+    if snake.move(food.position):
         score+=1
         score_lable.set_text(f'очки:{score}')
         food.respawn()
@@ -134,4 +136,4 @@ while run:
     game_window.blit(score_lable.image, score_lable.rect)
     display.update()
     clock.tick(10)
-quit()
+Quit()
