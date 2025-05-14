@@ -87,8 +87,7 @@ class Snake:
         for part in self.body:
             draw.rect(surface, BLACK, Rect(part[0], part[1], block_size, block_size))
 
-def draw_food(pos):
-    draw.rect(game_window, RED, Rect(pos[0], pos[1], block_size, block_size))
+
 
 def show_score(score):
     label = score_font.render(f'Очки: {score}', True, WHITE)
@@ -125,7 +124,6 @@ while run:
 
     game_window.fill(LIGHTGREEN)
     snake.draw(game_window)
-    draw_food(food_pos)
     show_score(score)
     display.update()
     clock.tick(10)
