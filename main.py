@@ -47,7 +47,6 @@ class Snake:
         self.change_to = self.direction
 
     def change_direction(self, new_dir):
-       
         opposites = {'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT'}
         if new_dir != opposites.get(self.direction):
             self.change_to = new_dir
@@ -75,29 +74,35 @@ class Snake:
 
     def check_collision(self):
         head = self.body[0]
-
         if head[0] < 0 or head[0] >= frame_size_x or head[1] < 0 or head[1] >= frame_size_y:
             return True
-
         if head in self.body[1:]:
             return True
         return False
-
+    
+    def check_collision_food(self):
+    
     def draw(self, surface):
         for part in self.body:
             draw.rect(surface, BLACK, Rect(part[0], part[1], block_size, block_size))
 
+class Food(Label):
+    def __init__(self):
+        self.position=[random.randrange(0,frame_size_x,block_size),random.randrange(0,frame_size_y,block_size)]
 
+    def respawn(self):
+        self.position=[random.randrange(0,frame_size_x,block_size),random.randrange(0,frame_size_y,block_size)]
 
-def show_score(score):
-    label = score_font.render(f'Очки: {score}', True, WHITE)
-    game_window.blit(label, (10, 10))
+    def draw(self,surface):
+        draw.rect(surface,RED,Rect(self.position[0], self.position[1], block_size, block_size))
 
+        
+    
 
 snake = Snake()
-food_pos = [random.randrange(0, frame_size_x, block_size),
-            random.randrange(0, frame_size_y, block_size)]
-score = 0
+food=Food()
+score=0
+score_lable= Label(f'очки:{score}',10,10)
 
 run = True
 while run:
@@ -114,18 +119,19 @@ while run:
             elif e.key == K_RIGHT:
                 snake.change_direction('RIGHT')
 
-    if snake.move(food_pos):
-        score += 1
-        food_pos = [random.randrange(0, frame_size_x, block_size),
-                    random.randrange(0, frame_size_y, block_size)]
+    if snake.check_collision(food.position):
+        score+=1
+        score_lable.set_text(f'очки:{score}')
+        food.respawn()
+
 
     if snake.check_collision():
         run = False
 
     game_window.fill(LIGHTGREEN)
     snake.draw(game_window)
-    show_score(score)
+    food.draw(game_window)
+    game_window.blit(score_lable.image, score_lable.rect)
     display.update()
     clock.tick(10)
-
-
+quit()
