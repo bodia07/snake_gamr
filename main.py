@@ -1,5 +1,6 @@
 from pygame import *
 import random
+import json 
 
 init()
 font.init()
@@ -26,6 +27,20 @@ score_font = font.Font(FONTNAME, 30)
 display.set_caption('Snake Eater')
 clock = time.Clock()
 game_window = display.set_mode((frame_size_x, frame_size_y))
+
+def savescore(score):
+    with open('score.json', 'w', encoding='utf-8') as f:
+            json.dump({"score":score}, f,ensure_ascii=False)
+
+def loadscore():
+    try:
+        with open('score.json', 'r', encoding='utf-8') as f:
+            score=json.load(f)
+            return score["score"]
+    except (FileNotFoundError,json.decoder.JSONDecodeError): 
+        print("файл не знайдено")
+        return 0
+
 
 class Label(sprite.Sprite):
     def __init__(self, text, x, y, fontsize=30, color=(225, 228, 232), font_name=FONTNAME):
@@ -103,7 +118,10 @@ class Food():
 snake = Snake()
 food=Food()
 score=0
-score_lable= Label(f'очки:{score}',10,10)
+maxscore=loadscore()
+score_lable= Label(f'score:{score}',10,10)
+maxscore_lable=Label(f'maxscore:{maxscore}',500,10)
+
 
 run = True
 while run:
@@ -123,17 +141,25 @@ while run:
 
     if snake.move(food.position):
         score+=1
-        score_lable.set_text(f'очки:{score}')
+        score_lable.set_text(f'score:{score}')
         food.respawn()
+        if score>maxscore:
+            maxscore=score
+            maxscore_lable.set_text(f'Maxsscore:{maxscore}')
+            savescore(maxscore)
+
 
 
     if snake.check_collision():
         run = False
 
+    
+
     game_window.fill(LIGHTGREEN)
     snake.draw(game_window)
     food.draw(game_window)
     game_window.blit(score_lable.image, score_lable.rect)
+    game_window.blit(maxscore_lable.image, maxscore_lable.rect)
     display.update()
     clock.tick(10)
-Quit()
+
