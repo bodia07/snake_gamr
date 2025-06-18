@@ -17,6 +17,8 @@ WHITE = (255, 255, 255)
 block_size = 20
 
 FONTNAME = "CoralPixels-Regular.ttf"
+ALT_FONTNAME = "BigShouldersStencil-VariableFont_opsz,wght.ttf"
+
 score_font = font.Font(FONTNAME, 30)
 
 display.set_caption('Snake Eater')
@@ -106,7 +108,7 @@ def start_screen():
     waiting = True
     while waiting:
         game_window.fill(BLACK)
-        title = Label("pres enter to start", 180, 200, 32, WHITE)
+        title = Label("pres ENTER for start", 180, 200, 32, WHITE, ALT_FONTNAME)
         game_window.blit(title.image, title.rect)
         display.update()
         for e in event.get():
@@ -116,60 +118,70 @@ def start_screen():
                 if e.key == K_RETURN:
                     waiting = False
 
-
 def game_over_screen(score, maxscore):
-    game_window.fill(BLACK)
-    gameover = Label("Game end", 280, 150, 40, RED)
-    score_l = Label(f"points: {score}", 280, 220, 30, WHITE)
-    maxscore_l = Label(f"max-points: {maxscore}", 280, 260, 30, WHITE)
-    game_window.blit(gameover.image, gameover.rect)
-    game_window.blit(score_l.image, score_l.rect)
-    game_window.blit(maxscore_l.image, maxscore_l.rect)
-    display.update()
-    time.wait(3000)
-
+    waiting = True
+    while waiting:
+        game_window.fill(BLACK)
+        gameover = Label("GAME END", 260, 120, 48, RED, ALT_FONTNAME)
+        score_l = Label(f"POINTS: {score}", 280, 200, 30, WHITE, ALT_FONTNAME)
+        maxscore_l = Label(f"MAX POINTS: {maxscore}", 280, 240, 30, WHITE, ALT_FONTNAME)
+        retry = Label("pres ENTER to reapet game", 170, 320, 24, WHITE, ALT_FONTNAME)
+        
+        game_window.blit(gameover.image, gameover.rect)
+        game_window.blit(score_l.image, score_l.rect)
+        game_window.blit(maxscore_l.image, maxscore_l.rect)
+        game_window.blit(retry.image, retry.rect)
+        display.update()
+        
+        for e in event.get():
+            if e.type == QUIT:
+                quit()
+            elif e.type == KEYDOWN:
+                if e.key == K_RETURN:
+                    waiting = False
 
 start_screen()
 
-snake = Snake()
-food = Food()
-score = 0
-maxscore = loadscore()
-score_lable = Label(f'score:{score}', 10, 10)
-maxscore_lable = Label(f'maxscore:{maxscore}', 500, 10)
+while True:
+    snake = Snake()
+    food = Food()
+    score = 0
+    maxscore = loadscore()
+    score_lable = Label(f'score:{score}', 10, 10)
+    maxscore_lable = Label(f'maxscore:{maxscore}', 500, 10)
 
-run = True
-while run:
-    for e in event.get():
-        if e.type == QUIT:
+    run = True
+    while run:
+        for e in event.get():
+            if e.type == QUIT:
+                quit()
+            elif e.type == KEYDOWN:
+                if e.key == K_UP:
+                    snake.change_direction('UP')
+                elif e.key == K_DOWN:
+                    snake.change_direction('DOWN')
+                elif e.key == K_LEFT:
+                    snake.change_direction('LEFT')
+                elif e.key == K_RIGHT:
+                    snake.change_direction('RIGHT')
+
+        if snake.move(food.position):
+            score += 1
+            score_lable.set_text(f'score:{score}')
+            food.respawn()
+            if score > maxscore:
+                maxscore = score
+                maxscore_lable.set_text(f'maxscore:{maxscore}')
+                savescore(maxscore)
+
+        if snake.check_collision():
             run = False
-        elif e.type == KEYDOWN:
-            if e.key == K_UP:
-                snake.change_direction('UP')
-            elif e.key == K_DOWN:
-                snake.change_direction('DOWN')
-            elif e.key == K_LEFT:
-                snake.change_direction('LEFT')
-            elif e.key == K_RIGHT:
-                snake.change_direction('RIGHT')
+            game_over_screen(score, maxscore)
 
-    if snake.move(food.position):
-        score += 1
-        score_lable.set_text(f'score:{score}')
-        food.respawn()
-        if score > maxscore:
-            maxscore = score
-            maxscore_lable.set_text(f'maxscore:{maxscore}')
-            savescore(maxscore)
-
-    if snake.check_collision():
-        run = False
-        game_over_screen(score, maxscore)  
-
-    game_window.fill(LIGHTGREEN)
-    snake.draw(game_window)
-    food.draw(game_window)
-    game_window.blit(score_lable.image, score_lable.rect)
-    game_window.blit(maxscore_lable.image, maxscore_lable.rect)
-    display.update()
-    clock.tick(10)
+        game_window.fill(LIGHTGREEN)
+        snake.draw(game_window)
+        food.draw(game_window)
+        game_window.blit(score_lable.image, score_lable.rect)
+        game_window.blit(maxscore_lable.image, maxscore_lable.rect)
+        display.update()
+        clock.tick(10)
