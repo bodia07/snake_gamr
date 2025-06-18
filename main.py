@@ -19,6 +19,10 @@ block_size = 20
 FONTNAME = "CoralPixels-Regular.ttf"
 ALT_FONTNAME = "BigShouldersStencil-VariableFont_opsz,wght.ttf"
 
+mixer.music.load("gaming-music-8-bit-console-play-background-intro-theme-342069.mp3")
+mixer.music.set_volume(0.1)
+mixer.music.play(loops=-1)
+
 score_font = font.Font(FONTNAME, 30)
 
 display.set_caption('Snake Eater')
